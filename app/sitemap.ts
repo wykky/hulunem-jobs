@@ -5,6 +5,12 @@ export const revalidate = 3600;
 
 const BASE = "https://jobs.hulunem.com";
 
+function safeDate(s: string, fallback: Date): Date {
+  if (!s) return fallback;
+  const d = new Date(s);
+  return isNaN(d.getTime()) ? fallback : d;
+}
+
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const jobs = await getJobs();
   const now = new Date();
@@ -17,7 +23,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       url: `${BASE}/jobs/${j.slug}`,
       changeFrequency: "weekly" as const,
       priority: 0.8,
-      lastModified: j.posted ? new Date(j.posted) : now,
+      lastModified: safeDate(j.posted, now),
     })),
   ];
 }
