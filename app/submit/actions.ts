@@ -2,6 +2,10 @@
 
 import { postRow } from "@/lib/post";
 
+function slugify(s: string) {
+  return s.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "").slice(0, 60);
+}
+
 export async function submitJob(formData: FormData): Promise<{ ok: boolean; error?: string }> {
   const get = (k: string) => String(formData.get(k) || "").trim();
 
@@ -19,6 +23,8 @@ export async function submitJob(formData: FormData): Promise<{ ok: boolean; erro
   if (!title || !company || !contact_email) return { ok: false, error: "Missing required fields" };
 
   const timestamp = new Date().toISOString();
-  const row = [timestamp, title, company, sector, location, type, expires, url, contact_name, contact_email, summary, "pending"];
+  const date = timestamp.slice(0, 10);
+  const slug = `${slugify(company)}-${slugify(title)}-${date}`;
+  const row = [timestamp, title, company, sector, location, type, expires, url, contact_name, contact_email, summary, "pending", slug];
   return await postRow("Submissions", row, "append");
 }

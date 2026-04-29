@@ -50,7 +50,7 @@ export default function SubmitPage() {
             <Select label="Type" name="type" options={TYPES} />
           </div>
           <div className="grid sm:grid-cols-2 gap-4">
-            <Field label="Location" name="location" placeholder="Addis Ababa" />
+            <Field label="Location *" name="location" required defaultValue="Addis Ababa" />
             <Field label="Expires" name="expires" type="date" />
           </div>
           <Field label="Apply URL or email" name="url" placeholder="https://… or mailto:…" />
@@ -71,11 +71,11 @@ export default function SubmitPage() {
   );
 }
 
-function Field({ label, name, type = "text", required, placeholder }: { label: string; name: string; type?: string; required?: boolean; placeholder?: string }) {
+function Field({ label, name, type = "text", required, placeholder, defaultValue }: { label: string; name: string; type?: string; required?: boolean; placeholder?: string; defaultValue?: string }) {
   return (
     <label className="block">
       <span className="text-xs text-muted">{label}</span>
-      <input name={name} type={type} required={required} placeholder={placeholder} className="mt-1 w-full bg-bg border border-border rounded px-3 py-2 text-sm focus:border-accent outline-none" />
+      <input name={name} type={type} required={required} placeholder={placeholder} defaultValue={defaultValue} className="mt-1 w-full bg-bg border border-border rounded px-3 py-2 text-sm focus:border-accent outline-none" />
     </label>
   );
 }
