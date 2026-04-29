@@ -3,6 +3,7 @@ import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { MapPin, Building2, Calendar, ExternalLink } from "lucide-react";
 import { notFound } from "next/navigation";
+import type { Metadata } from "next";
 
 export const revalidate = 60;
 
@@ -11,10 +12,48 @@ export async function generateStaticParams() {
   return jobs.map((j) => ({ slug: j.slug }));
 }
 
+export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
+  const { slug } = await params;
+  const j = await getJobBySlug(slug);
+  if (!j) return { title: "Job not found" };
+  const desc = `${j.company} — ${j.type} position in ${j.location || "Ethiopia"}. ${j.summary}`.slice(0, 200);
+  return {
+    title: `${j.title} — ${j.company}`,
+    description: desc,
+    alternates: { canonical: `/jobs/${j.slug}` },
+    openGraph: {
+      type: "article",
+      url: `https://jobs.hulunem.com/jobs/${j.slug}`,
+      title: `${j.title} — ${j.company}`,
+      description: desc,
+      publishedTime: j.posted,
+    },
+    twitter: { card: "summary_large_image", title: `${j.title} — ${j.company}`, description: desc },
+  };
+}
+
 export default async function JobPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
   const job = await getJobBySlug(slug);
   if (!job) notFound();
+
+  const jobJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "JobPosting",
+    title: job.title,
+    description: job.summary,
+    datePosted: job.posted,
+    validThrough: job.expires,
+    employmentType: (job.type || "FULL_TIME").toUpperCase().replace(/[\s-]/g, "_"),
+    hiringOrganization: { "@type": "Organization", name: job.company },
+    jobLocation: {
+      "@type": "Place",
+      address: { "@type": "PostalAddress", addressLocality: job.location || "Addis Ababa", addressCountry: "ET" },
+    },
+    industry: job.sector,
+    url: `https://jobs.hulunem.com/jobs/${job.slug}`,
+    directApply: false,
+  };
 
   return (
     <div className="min-h-screen">
@@ -42,6 +81,7 @@ export default async function JobPage({ params }: { params: Promise<{ slug: stri
         </article>
       </main>
       <Footer />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jobJsonLd) }} />
     </div>
   );
 }
