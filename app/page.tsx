@@ -1,7 +1,8 @@
-import { getJobs, getSkills, type JobRow } from "@/lib/data";
+import { getJobs, getSkills } from "@/lib/data";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
-import { MapPin, Building2, Calendar, ArrowRight } from "lucide-react";
+import { JobsList } from "@/components/JobsList";
+import { ArrowRight } from "lucide-react";
 
 export const revalidate = 60;
 
@@ -15,19 +16,7 @@ export default async function Home() {
       <main className="max-w-7xl mx-auto px-3 sm:px-4 py-6 grid gap-6 lg:grid-cols-3">
         <section className="lg:col-span-2 space-y-6 min-w-0">
           <Hero count={jobs.length} sectors={sectors.length} />
-          <div className="border border-border bg-panel rounded-lg overflow-hidden">
-            <div className="px-4 py-3 border-b border-border flex items-center justify-between">
-              <h2 className="font-semibold text-sm">Latest Jobs</h2>
-              <span className="text-xs text-muted num">{jobs.length} active</span>
-            </div>
-            {jobs.length === 0 ? (
-              <div className="px-4 py-8 text-center text-sm text-muted">No jobs posted yet.</div>
-            ) : (
-              <ul className="divide-y divide-border">
-                {jobs.map((j) => <JobItem key={j.slug} job={j} />)}
-              </ul>
-            )}
-          </div>
+          <JobsList jobs={jobs} />
         </section>
 
         <aside className="space-y-6">
@@ -71,31 +60,8 @@ function Hero({ count, sectors }: { count: number; sectors: number }) {
       <div className="text-xs uppercase tracking-widest text-accent mb-2">Hulunem Jobs</div>
       <h1 className="text-xl sm:text-2xl font-semibold mb-2">Find your next role in Ethiopia</h1>
       <p className="text-muted text-sm leading-relaxed">
-        <span className="num">{count}</span> active listings across <span className="num">{sectors}</span> sectors. Updated daily from EthioJobs, HaHu, and direct employer submissions.
+        <span className="num">{count}</span> active listings across <span className="num">{sectors}</span> sectors. Updated Mon &amp; Thu from EthioJobs, HaHu, WeWorkRemotely, RemoteOK, and direct submissions.
       </p>
     </section>
-  );
-}
-
-function JobItem({ job }: { job: JobRow }) {
-  return (
-    <li className="px-4 py-4 hover:bg-bg/40">
-      <a href={`/jobs/${job.slug}`} className="block">
-        <div className="flex items-start justify-between gap-3">
-          <div className="min-w-0">
-            <div className="font-medium text-sm hover:text-accent break-words">{job.title}</div>
-            <div className="flex items-center gap-3 text-xs text-muted mt-1 flex-wrap">
-              <span className="flex items-center gap-1"><Building2 size={12} />{job.company}</span>
-              {job.location && <span className="flex items-center gap-1"><MapPin size={12} />{job.location}</span>}
-              {job.expires && <span className="flex items-center gap-1 num"><Calendar size={12} />exp. {job.expires}</span>}
-            </div>
-          </div>
-          <div className="text-right shrink-0">
-            <span className="text-[10px] uppercase tracking-widest text-accent">{job.sector}</span>
-            <div className="text-xs text-muted mt-1">{job.type}</div>
-          </div>
-        </div>
-      </a>
-    </li>
   );
 }
