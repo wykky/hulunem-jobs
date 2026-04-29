@@ -3,7 +3,7 @@ import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { MapPin, Building2, Calendar, ArrowRight } from "lucide-react";
 
-export const revalidate = 300;
+export const revalidate = 60;
 
 export default async function Home() {
   const [jobs, skills] = await Promise.all([getJobs(), getSkills()]);
